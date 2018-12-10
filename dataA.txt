@@ -1,0 +1,54 @@
+#! /bin/sh
+
+mkdir assignments &> /dev/null
+
+while IFS='' read -r line || [[ -n "$line" ]]
+do
+	x=${line:0:1}
+	if [ "$x" != "#" ]; then
+		cd ~/assignments
+		git clone $line &> /dev/null
+		if (test $? == 0 ); then
+			echo $line Cloning OK
+		else
+			echo $line Cloning FAILED
+		fi
+	fi
+done < $1
+
+array=$(ls  ~/assignments)
+for i in $array
+do	
+	counterfolder=0
+	countertxt=0
+	counterother=0
+	counter=2
+	echo $i:
+	array2=$(ls ~/assignments/$i)
+	url="~/assignments/$i"
+	for j in $array2;
+	do
+		if [[ "$j" == *"."* ]];then
+			echo 
+		else 
+			more=$(ls  ~/assignments/$i/$j)
+			array2="$array2 $more"
+		fi
+	done
+	for j in $array2;
+	do
+		if [[ "$j" == *"."* ]];then
+			if [[ "$j" == *".txt"* ]];then
+				countertxt=$((countertxt+1))
+			else
+				counterother=$((counterother+1))
+			fi
+		else 
+			counterfolder=$((counterfolder+1))
+
+		fi
+	done
+	echo Number of directories : $counterfolder
+	echo Number of txt files : $countertxt
+	echo Number of other files : $counterother	
+done
