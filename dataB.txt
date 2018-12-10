@@ -1,0 +1,36 @@
+#!/bin/bash 
+
+while IFS='' read -r line || [[ -n "$line" ]]
+do	
+	x=${line:0:1}
+	if [ "$x" != "#" ]; then	
+		foo=$(echo $line| tr -d ' ')
+		foo=$(echo $line| tr -d "https://www.")
+		####	
+		ls $foo &> /dev/null
+		if test $? -eq 2 ; then
+
+			wget $line -O $foo &> /dev/null
+			ls $foo &> /dev/null
+			######
+			if test $? -eq 0 ; then	
+				echo $line "INIT"
+			else
+				echo $line "FAILED"
+			fi
+		else
+			a=".1"
+			b="$foo$a" 
+			#####
+			wget $line -O $b &> /dev/null
+			diff  $foo $b &> /dev/null 
+			if test $? -eq 0 ; then	
+				echo ""
+			else
+				echo $line
+			fi
+			
+		fi
+	fi
+done < $1
+
